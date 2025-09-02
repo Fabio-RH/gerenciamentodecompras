@@ -1,6 +1,10 @@
 package com.senac.gerenciamentodecompras.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.Set;
+
 @Entity
 @Table(name="produto")
 public class Produto {
@@ -16,6 +20,13 @@ public class Produto {
     private String unidade_medida;
     @Column(name = "produto_status")
     private int status;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private  Usuario usuario;
+    @OneToMany (mappedBy = "produto")
+    private Set<Item> itens;
 
     public Integer getId() {
         return id;
@@ -55,5 +66,21 @@ public class Produto {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Set<Item> getItens() {
+        return itens;
+    }
+
+    public void setItens(Set<Item> itens) {
+        this.itens = itens;
     }
 }

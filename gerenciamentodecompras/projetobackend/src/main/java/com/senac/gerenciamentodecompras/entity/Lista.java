@@ -1,8 +1,10 @@
 package com.senac.gerenciamentodecompras.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name="lista")
@@ -17,6 +19,17 @@ public class Lista {
     private LocalDateTime data_criacao;
     @Column(name = "lista_status")
     private int status;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name="usuario_id", nullable = false)
+    private Usuario usuario;
+
+    @OneToMany (mappedBy = "lista")
+    private Set<Item> itens;
+
+    @OneToMany (mappedBy = "lista")
+    private Set<Recibo> recibos;
 
     public Integer getId() {
         return id;
@@ -48,5 +61,29 @@ public class Lista {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Set<Item> getItens() {
+        return itens;
+    }
+
+    public void setItens(Set<Item> itens) {
+        this.itens = itens;
+    }
+
+    public Set<Recibo> getRecibos() {
+        return recibos;
+    }
+
+    public void setRecibos(Set<Recibo> recibos) {
+        this.recibos = recibos;
     }
 }

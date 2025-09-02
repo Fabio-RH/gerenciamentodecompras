@@ -1,5 +1,6 @@
 package com.senac.gerenciamentodecompras.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,10 @@ public class Recibo {
     private LocalDateTime data_upload;
     @Column(name = "recibo_status")
     private int status;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "lista_id", nullable = false)
+    private  Lista lista;
 
     public Integer getId() {
         return id;
@@ -68,5 +73,13 @@ public class Recibo {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Lista getLista() {
+        return lista;
+    }
+
+    public void setLista(Lista lista) {
+        this.lista = lista;
     }
 }

@@ -1,6 +1,9 @@
 package com.senac.gerenciamentodecompras.entity;
 
 import jakarta.persistence.*;
+
+import java.util.Set;
+
 @Entity
 @Table(name="usuario")
 public class Usuario {
@@ -16,6 +19,10 @@ public class Usuario {
     private String senha;
     @Column(name="usuario_status")
     private int status;
+    @OneToMany(mappedBy = "usuario")
+    private Set<Lista> listas;
+    @OneToMany(mappedBy = "usuario")
+    private Set<Produto> produtos;
 
     public Integer getId() {
         return id;
@@ -55,5 +62,21 @@ public class Usuario {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Set<Lista> getListas() {
+        return listas;
+    }
+
+    public void setListas(Set<Lista> listas) {
+        this.listas = listas;
+    }
+
+    public Set<Produto> getProdutos() {
+        return produtos;
+    }
+
+    public void setProdutos(Set<Produto> produtos) {
+        this.produtos = produtos;
     }
 }
