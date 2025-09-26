@@ -29,10 +29,10 @@ public class Lista {
     @JoinColumn(name="usuario_id", nullable = false)
     private Usuario usuario;
 
-    @OneToMany (mappedBy = "item_id")
+    @OneToMany(mappedBy = "lista")
     private Set<Item> itens;
 
-    @OneToMany (mappedBy = "recibo_id")
+    @OneToMany(mappedBy = "lista")
     private Set<Recibo> recibos;
 
     public Integer getLista_id() {

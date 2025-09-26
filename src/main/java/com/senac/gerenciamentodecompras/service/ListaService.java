@@ -2,6 +2,7 @@ package com.senac.gerenciamentodecompras.service;
 
 import com.senac.gerenciamentodecompras.dto.request.ListaDTORequest;
 import com.senac.gerenciamentodecompras.dto.request.ListaDTOUpdateRequest;
+import com.senac.gerenciamentodecompras.dto.response.ListaDTOResponse;
 import com.senac.gerenciamentodecompras.dto.response.*;
 import com.senac.gerenciamentodecompras.entity.Lista;
 import com.senac.gerenciamentodecompras.entity.Usuario;
@@ -47,10 +48,23 @@ public class ListaService {
 
 
     public ListaDTOResponse criarLista(ListaDTORequest listaDTORequest) {
+        Lista lista = new Lista();
+        lista.setLista_nome(listaDTORequest.getLista_nome());
+        lista.setLista_dataCriacao(listaDTORequest.getLista_dataCriacao());
+        lista.setLista_status(listaDTORequest.getLista_status());
+        Usuario usuario = usuarioRepository.obterUsuarioPeloId(listaDTORequest.getUsuario_id());
+        if (usuario == null){
 
-        Lista lista = modelMapper.map(listaDTORequest, Lista.class);
-        Lista listaSave = this.listaRepository.save(lista);
-        return modelMapper.map(listaSave, ListaDTOResponse.class);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuário não encontrado");
+        }
+        lista.setUsuario(usuario);
+        Lista listaSave = listaRepository.save(lista);
+
+        ListaDTOResponse listaDTOResponse = modelMapper.map(listaSave, ListaDTOResponse.class);
+        return listaDTOResponse;
+
+
+
     }
 
 
@@ -88,9 +102,9 @@ public class ListaService {
         // se encontra o registro a ser atualizado
         if (lista != null) {
             // atualiza o status da lista a partir do DTO
-            lista.setLista_status(listaDTOUpdateRequest.getLista_status());
-            Lista listaSave = listaRepository.save(lista);
-            return modelMapper.map(listaSave, ListaDTOUpdateResponse.class);
+            lista.setLista_status(listaDTOUpdateRequest.getStatus());
+            Lista ListaSave = listaRepository.save(lista);
+            return modelMapper.map(ListaSave, ListaDTOUpdateResponse.class);
         } else {
             // Error 400 caso tente atualizar lista inexistente.
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);

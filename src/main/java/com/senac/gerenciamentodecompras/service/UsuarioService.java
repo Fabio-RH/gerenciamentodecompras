@@ -1,10 +1,12 @@
 package com.senac.gerenciamentodecompras.service;
 
 import com.senac.gerenciamentodecompras.dto.request.UsuarioDTORequest;
+import com.senac.gerenciamentodecompras.dto.request.UsuarioDTOUpdateRequest;
 import com.senac.gerenciamentodecompras.dto.response.*;
 import com.senac.gerenciamentodecompras.entity.Usuario;
 import com.senac.gerenciamentodecompras.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,9 +36,9 @@ public class UsuarioService {
                 .toList();
     }
 
-    public UsuarioDTOResponse listarPorUsuarioId(Integer usuarioId) {
+    public UsuarioDTOUpdateResponse listarPorUsuarioId(Integer usuarioId) {
         Usuario usuario = usuarioRepository.obterUsuarioPeloId(usuarioId);
-        return (usuario != null) ? modelMapper.map(usuario, UsuarioDTOResponse.class) : null;
+        return (usuario != null) ? modelMapper.map(usuario, UsuarioDTOUpdateResponse.class) : null;
     }
 
     @Transactional
@@ -64,7 +66,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioDTOUpdateResponse atualizarStatusUsuario(Integer usuarioId, UsuarioDTORequest usuarioDTOUpdateRequest) {
+    public UsuarioDTOUpdateResponse atualizarStatusUsuario(Integer usuarioId, @Valid UsuarioDTOUpdateRequest usuarioDTOUpdateRequest) {
         // antes de atualizar busca se existe o registro a ser atualizado
         Usuario usuario = usuarioRepository.obterUsuarioPeloId(usuarioId);
         // se encontra o registro a ser atualizado

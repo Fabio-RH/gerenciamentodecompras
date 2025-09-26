@@ -1,11 +1,17 @@
 package com.senac.gerenciamentodecompras.service;
 
 import com.senac.gerenciamentodecompras.dto.request.ItemDTORequest;
+import com.senac.gerenciamentodecompras.dto.request.ItemDTOUpdateRequest;
+import com.senac.gerenciamentodecompras.dto.request.ListaDTORequest;
 import com.senac.gerenciamentodecompras.dto.response.*;
 import com.senac.gerenciamentodecompras.entity.Item;
 import com.senac.gerenciamentodecompras.entity.Lista;
+import com.senac.gerenciamentodecompras.entity.Produto;
+import com.senac.gerenciamentodecompras.entity.Usuario;
 import com.senac.gerenciamentodecompras.repository.ItemRepository;
 import com.senac.gerenciamentodecompras.repository.ListaRepository;
+import com.senac.gerenciamentodecompras.repository.ProdutoRepository;
+import com.senac.gerenciamentodecompras.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,21 +47,34 @@ public class ItemService {
         return (item != null) ? modelMapper.map(item, ItemDTOResponse.class) : null;
     }
 
+    @Autowired
+    private ProdutoRepository produtoRepository;
 
-    @Transactional
+    @Autowired
+    private ListaRepository listaRepository;
+
+
     public ItemDTOResponse criarItem(ItemDTORequest itemDTORequest) {
-        Item i = new Item();
-        i.setItem_quantidade(itemDTORequest.getItem_quantidade());
-        i.setItem_status(1);
-        if (i.getLista()!= null ){
+        Item item = new Item();
+        item.setItem_quantidade(itemDTORequest.getItem_quantidade());
+        item.setItem_status(itemDTORequest.getItem_status());
+        Produto produto = produtoRepository.obterProdutoPeloId(itemDTORequest.getProduto_id());
+        Lista lista = listaRepository.obterListaPeloId(itemDTORequest.getLista_id());
+        if (produto == null){
 
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Produto não encontrado");
         }
+        if (lista == null){
 
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lista não encontrada");
+        }
+        item.setProduto(produto);
+        item.setLista(lista);
+        Item itemSave = itemRepository.save(item);
 
+        ItemDTOResponse itemDTOResponse = modelMapper.map(itemSave, ItemDTOResponse.class);
+        return itemDTOResponse;
 
-        Item item = modelMapper.map(itemDTORequest, Item.class);
-        Item itemSave = this.itemRepository.save(item);
-        return modelMapper.map(itemSave, ItemDTOResponse.class);
     }
 
     @Transactional
@@ -76,7 +95,7 @@ public class ItemService {
     }
 
     @Transactional
-    public ItemDTOUpdateResponse atualizarStatusItem(Integer itemId, ItemDTORequest itemDTOUpdateRequest) {
+    public ItemDTOUpdateResponse atualizarStatusItem(Integer itemId, ItemDTOUpdateRequest itemDTOUpdateRequest) {
         // antes de atualizar busca se existe o registro a ser atualizado
         Item item = itemRepository.obterItemPeloId(itemId);
         // se encontra o registro a ser atualizado

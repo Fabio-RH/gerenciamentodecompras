@@ -1,6 +1,7 @@
 package com.senac.gerenciamentodecompras.controller;
 
 import com.senac.gerenciamentodecompras.dto.request.UsuarioDTORequest;
+import com.senac.gerenciamentodecompras.dto.request.UsuarioDTOUpdateRequest;
 import com.senac.gerenciamentodecompras.dto.response.UsuarioDTOResponse;
 import com.senac.gerenciamentodecompras.dto.response.UsuarioDTOUpdateResponse;
 import com.senac.gerenciamentodecompras.entity.Usuario;
@@ -37,8 +38,8 @@ public class UsuarioController {
             summary = "Listar usuario pelo id de usuario",
             description = "Endpoint para listar usuario por Id de usuario"
     )
-    public ResponseEntity<UsuarioDTOResponse> listarPorUsuarioId(@PathVariable("usuarioId") Integer usuarioId) {
-        UsuarioDTOResponse usuario = usuarioService.listarPorUsuarioId(usuarioId);
+    public ResponseEntity<UsuarioDTOUpdateResponse> listarPorUsuarioId(@PathVariable("usuarioId") Integer usuarioId) {
+        UsuarioDTOUpdateResponse usuario = usuarioService.listarPorUsuarioId(usuarioId);
         if (usuario == null) {
             return ResponseEntity.noContent().build();
         } else {
@@ -76,7 +77,7 @@ public class UsuarioController {
     )
     public ResponseEntity<UsuarioDTOUpdateResponse> atualizarStatusUsuario(
             @PathVariable("usuarioId") Integer usuarioId,
-            @Valid @RequestBody UsuarioDTORequest usuarioDTOUpdateRequest
+            @Valid @RequestBody UsuarioDTOUpdateRequest usuarioDTOUpdateRequest
     ) {
         return ResponseEntity.ok(usuarioService.atualizarStatusUsuario(usuarioId, usuarioDTOUpdateRequest));
     }

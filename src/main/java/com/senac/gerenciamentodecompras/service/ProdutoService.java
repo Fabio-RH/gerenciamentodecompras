@@ -1,8 +1,12 @@
 package com.senac.gerenciamentodecompras.service;
 
+import com.senac.gerenciamentodecompras.dto.request.ListaDTORequest;
 import com.senac.gerenciamentodecompras.dto.request.ProdutoDTORequest;
+import com.senac.gerenciamentodecompras.dto.request.ProdutoDTOUpdateRequest;
 import com.senac.gerenciamentodecompras.dto.response.*;
+import com.senac.gerenciamentodecompras.entity.Lista;
 import com.senac.gerenciamentodecompras.entity.Produto;
+import com.senac.gerenciamentodecompras.entity.Usuario;
 import com.senac.gerenciamentodecompras.repository.ProdutoRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -39,11 +43,15 @@ public class ProdutoService {
         return (produto != null) ? modelMapper.map(produto, ProdutoDTOResponse.class) : null;
     }
 
-    @Transactional
     public ProdutoDTOResponse criarProduto(ProdutoDTORequest produtoDTORequest) {
-        Produto produto = modelMapper.map(produtoDTORequest, Produto.class);
-        Produto produtoSave = this.produtoRepository.save(produto);
-        return modelMapper.map(produtoSave, ProdutoDTOResponse.class);
+        Produto produto = new Produto();
+        produto.setProduto_nome(produtoDTORequest.getProduto_nome());
+        produto.setProduto_categoria(produtoDTORequest.getProduto_categoria());
+        produto.setProduto_unidade_medida(produtoDTORequest.getProduto_unidade_medida());
+        produto.setProduto_status(produtoDTORequest.getProduto_status());
+        Produto produtoSave = produtoRepository.save(produto);
+        ProdutoDTOResponse produtoDTOResponse = modelMapper.map(produtoSave, ProdutoDTOResponse.class);
+        return produtoDTOResponse;
     }
 
     @Transactional
@@ -64,7 +72,7 @@ public class ProdutoService {
     }
 
     @Transactional
-    public ProdutoDTOUpdateResponse atualizarStatusProduto(Integer produtoId, ProdutoDTORequest produtoDTOUpdateRequest) {
+    public ProdutoDTOUpdateResponse atualizarStatusProduto(Integer produtoId, ProdutoDTOUpdateRequest produtoDTOUpdateRequest) {
         // antes de atualizar busca se existe o registro a ser atualizado
         Produto produto = produtoRepository.obterProdutoPeloId(produtoId);
         // se encontra o registro a ser atualizado

@@ -41,19 +41,13 @@ public class UsuarioDTORequest {
         this.usuario_status = usuario_status;
     }
 
-    public Integer getLista_id() {
-        return lista_id;
-    }
-
-    public void setLista_id(Integer lista_id) {
-        this.lista_id = lista_id;
-    }
 
     private String usuario_senha;
 
     private int usuario_status;
 
-    private Integer lista_id;
+
+
 
 
 

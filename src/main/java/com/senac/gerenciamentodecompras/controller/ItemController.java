@@ -1,6 +1,7 @@
 package com.senac.gerenciamentodecompras.controller;
 
 import com.senac.gerenciamentodecompras.dto.request.ItemDTORequest;
+import com.senac.gerenciamentodecompras.dto.request.ItemDTOUpdateRequest;
 import com.senac.gerenciamentodecompras.dto.response.ItemDTOResponse;
 import com.senac.gerenciamentodecompras.dto.response.ItemDTOUpdateResponse;
 import com.senac.gerenciamentodecompras.entity.Item;
@@ -76,7 +77,7 @@ public class ItemController {
     )
     public ResponseEntity<ItemDTOUpdateResponse> atualizarStatusItem(
             @PathVariable("itemId") Integer itemId,
-            @Valid @RequestBody ItemDTORequest itemDTOUpdateRequest
+            @Valid @RequestBody ItemDTOUpdateRequest itemDTOUpdateRequest
     ) {
         return ResponseEntity.ok(itemService.atualizarStatusItem(itemId, itemDTOUpdateRequest));
     }

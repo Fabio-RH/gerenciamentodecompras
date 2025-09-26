@@ -1,8 +1,13 @@
 package com.senac.gerenciamentodecompras.service;
 
+import com.senac.gerenciamentodecompras.dto.request.ListaDTORequest;
 import com.senac.gerenciamentodecompras.dto.request.ReciboDTORequest;
+import com.senac.gerenciamentodecompras.dto.request.ReciboDTOUpdateRequest;
 import com.senac.gerenciamentodecompras.dto.response.*;
+import com.senac.gerenciamentodecompras.entity.Lista;
 import com.senac.gerenciamentodecompras.entity.Recibo;
+import com.senac.gerenciamentodecompras.entity.Usuario;
+import com.senac.gerenciamentodecompras.repository.ListaRepository;
 import com.senac.gerenciamentodecompras.repository.ReciboRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -20,6 +25,9 @@ public class ReciboService {
 
     @Autowired
     private final ModelMapper modelMapper;
+
+    @Autowired
+    private ListaRepository listaRepository;
 
     public ReciboService(ReciboRepository reciboRepository,
                          ModelMapper modelMapper) {
@@ -39,11 +47,23 @@ public class ReciboService {
         return (recibo != null) ? modelMapper.map(recibo, ReciboDTOResponse.class) : null;
     }
 
-    @Transactional
     public ReciboDTOResponse criarRecibo(ReciboDTORequest reciboDTORequest) {
-        Recibo recibo = modelMapper.map(reciboDTORequest, Recibo.class);
-        Recibo reciboSave = this.reciboRepository.save(recibo);
-        return modelMapper.map(reciboSave, ReciboDTOResponse.class);
+        Recibo recibo = new Recibo();
+        recibo.setRecibo_caminho_imagem(reciboDTORequest.getRecibo_caminho_imagem());
+        recibo.setRecibo_valor(reciboDTORequest.getRecibo_valor());
+        recibo.setRecibo_observacao(reciboDTORequest.getRecibo_observacao());
+        recibo.setRecibo_data_upload(reciboDTORequest.getRecibo_data_upload());
+        recibo.setRecibo_status(reciboDTORequest.getRecibo_status());
+        Lista lista = listaRepository.obterListaPeloId(reciboDTORequest.getLista_id());
+        if (lista == null){
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lista não encontrada");
+        }
+        recibo.setLista(lista);
+        Recibo reciboSave = reciboRepository.save(recibo);
+
+        ReciboDTOResponse reciboDTOResponse = modelMapper.map(reciboSave, ReciboDTOResponse.class);
+        return reciboDTOResponse;
     }
 
     @Transactional
@@ -64,7 +84,7 @@ public class ReciboService {
     }
 
     @Transactional
-    public ReciboDTOUpdateResponse atualizarStatusRecibo(Integer reciboId, ReciboDTORequest reciboDTOUpdateRequest) {
+    public ReciboDTOUpdateResponse atualizarStatusRecibo(Integer reciboId, ReciboDTOUpdateRequest reciboDTOUpdateRequest) {
         // antes de atualizar busca se existe o registro a ser atualizado
         Recibo recibo = reciboRepository.obterReciboPeloId(reciboId);
         // se encontra o registro a ser atualizado

@@ -2,13 +2,13 @@ package com.senac.gerenciamentodecompras.dto.request;
 
 public class UsuarioDTOUpdateRequest {
 
-    private int status;
+    private int usuario_status;
 
-    public int getStatus() {
-        return status;
+    public int getUsuario_status() {
+        return usuario_status;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setUsuario_status(int usuario_status) {
+        this.usuario_status = usuario_status;
     }
 }

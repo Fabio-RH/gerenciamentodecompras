@@ -2,11 +2,6 @@ package com.senac.gerenciamentodecompras.dto.request;
 
 public class ItemDTORequest {
 
-
-
-
-
-
     private int item_quantidade;
 
     private int item_status;

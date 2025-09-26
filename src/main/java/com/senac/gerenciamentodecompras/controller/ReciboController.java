@@ -1,6 +1,7 @@
 package com.senac.gerenciamentodecompras.controller;
 
 import com.senac.gerenciamentodecompras.dto.request.ReciboDTORequest;
+import com.senac.gerenciamentodecompras.dto.request.ReciboDTOUpdateRequest;
 import com.senac.gerenciamentodecompras.dto.response.ReciboDTOResponse;
 import com.senac.gerenciamentodecompras.dto.response.ReciboDTOUpdateResponse;
 import com.senac.gerenciamentodecompras.entity.Recibo;
@@ -76,7 +77,7 @@ public class ReciboController {
     )
     public ResponseEntity<ReciboDTOUpdateResponse> atualizarStatusRecibo(
             @PathVariable("reciboId") Integer reciboId,
-            @Valid @RequestBody ReciboDTORequest reciboDTOUpdateRequest
+            @Valid @RequestBody ReciboDTOUpdateRequest reciboDTOUpdateRequest
     ) {
         return ResponseEntity.ok(reciboService.atualizarStatusRecibo(reciboId, reciboDTOUpdateRequest));
     }
