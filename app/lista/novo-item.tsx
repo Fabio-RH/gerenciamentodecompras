@@ -11,19 +11,21 @@ export default function NovoItem() {
     nome?: string;
   }>();
 
-  const { adicionarItem, editarItem } = useListas() as any;
+  const { adicionarItem, editarItem } = useListas();
   const [nome, setNome] = useState(nomeInicial || "");
 
   const salvar = () => {
     if (!nome.trim()) return alert("Digite o nome do item!");
 
     if (itemId) {
-      editarItem(listaId, itemId, nome);
+      editarItem?.(listaId, itemId, nome);
+      alert("Item atualizado!");
     } else {
-      adicionarItem(listaId, nome);
+      adicionarItem?.(listaId, nome);
+      alert("Item adicionado!");
     }
 
-    router.back();
+    router.replace(`/lista/${listaId}`); // ✅ volta pra lista correspondente
   };
 
   return (
@@ -36,7 +38,16 @@ export default function NovoItem() {
         onChangeText={setNome}
       />
       <TouchableOpacity style={styles.button} onPress={salvar}>
-        <Text style={styles.buttonText}>{itemId ? "Salvar Alterações" : "Adicionar Item"}</Text>
+        <Text style={styles.buttonText}>
+          {itemId ? "Salvar Alterações" : "Adicionar Item"}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, styles.secondaryButton]}
+        onPress={() => router.replace(`/lista/${listaId}`)}
+      >
+        <Text style={styles.buttonText}>Voltar para Lista</Text>
       </TouchableOpacity>
     </View>
   );
@@ -57,6 +68,10 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: "center",
     borderRadius: 8,
+    marginBottom: 10,
+  },
+  secondaryButton: {
+    backgroundColor: "#999",
   },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 });

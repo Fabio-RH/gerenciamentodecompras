@@ -9,6 +9,7 @@ export default function Layout() {
           headerStyle: { backgroundColor: "#7b3fcf" },
           headerTintColor: "#fff",
           headerTitleAlign: "center",
+          headerShown: false,
         }}
       />
     </ListasProvider>

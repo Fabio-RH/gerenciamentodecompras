@@ -1,25 +1,47 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useListas } from "../../context/ListasContext";
 
 export default function ListaDetalhes() {
-  const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const ctx = useListas() as any;
-  const { listas, toggleItem } = ctx;
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { listas, excluirItem, toggleItem } = useListas();
 
-  const lista = listas.find((l: any) => l.id === id);
-  if (!lista) return <Text>Lista não encontrada.</Text>;
+  const lista = listas.find((l) => l.id === id);
+
+  if (!lista) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Lista não encontrada.</Text>
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: "#999" }]}
+          onPress={() => router.push("/")}
+        >
+          <Text style={styles.addText}>Voltar para Home</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>{lista.nome}</Text>
+
       <FlatList
         data={lista.itens}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.item}
-            onPress={() => toggleItem(lista.id, item.id)}
+            onPress={() => toggleItem?.(lista.id, item.id)}
           >
             <Text style={[styles.text, item.comprado && styles.comprado]}>
               {item.nome}
@@ -29,23 +51,17 @@ export default function ListaDetalhes() {
                 onPress={() =>
                   router.push({
                     pathname: "/lista/novo-item",
-                    params: { listaId: lista.id, itemId: item.id, nome: item.nome },
-                  } as any)
+                    params: {
+                      listaId: lista.id,
+                      itemId: item.id,
+                      nome: item.nome,
+                    },
+                  })
                 }
               >
                 <Text style={styles.edit}>Editar</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() =>
-                  Alert.alert("Excluir item", "Deseja excluir este item?", [
-                    { text: "Cancelar", style: "cancel" },
-                    {
-                      text: "Excluir",
-                      onPress: () => ctx.excluirItem(lista.id, item.id),
-                    },
-                  ])
-                }
-              >
+              <TouchableOpacity onPress={() => excluirItem?.(lista.id, item.id)}>
                 <Text style={styles.delete}>Excluir</Text>
               </TouchableOpacity>
             </View>
@@ -55,11 +71,17 @@ export default function ListaDetalhes() {
 
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() =>
-          router.push({ pathname: "/lista/novo-item", params: { listaId: lista.id } } as any)
-        }
+        onPress={() => router.push({ pathname: "/lista/novo-item", params: { listaId: lista.id } })}
       >
         <Text style={styles.addText}>+ Novo Item</Text>
+      </TouchableOpacity>
+
+      {/* 🟣 Botão para voltar pra Home */}
+      <TouchableOpacity
+        style={[styles.addButton, styles.backButton]}
+        onPress={() => router.push("/")}
+      >
+        <Text style={styles.addText}>⬅ Voltar para Home</Text>
       </TouchableOpacity>
     </View>
   );
@@ -67,10 +89,27 @@ export default function ListaDetalhes() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#e7cfcf", padding: 10 },
-  item: { backgroundColor: "#fff", padding: 15, borderRadius: 8, marginVertical: 5 },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 10,
+    color: "#4a2e8e",
+  },
+  item: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 8,
+    marginVertical: 5,
+  },
   text: { fontSize: 16 },
   comprado: { textDecorationLine: "line-through", color: "#777" },
-  actions: { flexDirection: "row", justifyContent: "flex-end", gap: 15, marginTop: 5 },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 15,
+    marginTop: 5,
+  },
   edit: { color: "#7b3fcf", fontWeight: "bold" },
   delete: { color: "#c75b5b", fontWeight: "bold" },
   addButton: {
@@ -79,6 +118,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 15,
+  },
+  backButton: {
+    backgroundColor: "#999",
   },
   addText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 });
