@@ -1,58 +1,56 @@
-// app/index.tsx
-
-import { AntDesign } from "@expo/vector-icons";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useListas } from "../context/ListasContext";
 
-export default function ListaPage() {
+export default function HomeScreen() {
   const router = useRouter();
-  const { listas } = useListas() as { listas: { id: number | string; nome: string }[] };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Listas</Text>
-
-      {listas.length === 0 ? (
-        <Text style={styles.vazio}>Nenhuma lista criada ainda.</Text>
-      ) : (
-        <FlatList
-          data={listas}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.item}
-              onPress={() => router.push(`/lista/${item.id}`)}
-            >
-              <Text style={styles.texto}>{item.nome}</Text>
-            </TouchableOpacity>
-          )}
-        />
-      )}
+      <Text style={styles.title}>Gerenciamento de Compras 🛒</Text>
 
       <TouchableOpacity
-        style={styles.botao}
-        // 🟢 MUDANÇA AQUI: Navegando para a nova subpasta `nova/index.tsx`
-        onPress={() => router.push("/lista/nova")}
+        style={[styles.button, { backgroundColor: "#7b3fcf" }]}
+        onPress={() => router.push("/login")}
       >
-        <AntDesign name="plus-circle" size={54} color="#7b3fcf" />
+        <Text style={styles.buttonText}>Fazer Login</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: "#4a2e8e" }]}
+        onPress={() => router.push("/cadastro")}
+      >
+        <Text style={styles.buttonText}>Cadastrar</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  titulo: { fontSize: 26, fontWeight: "bold", color: "#7b3fcf", marginBottom: 20 },
-  item: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+  container: {
+    flex: 1,
+    backgroundColor: "#f3e5f5",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
   },
-  texto: { fontSize: 18 },
-  vazio: { fontSize: 16, color: "#777", textAlign: "center", marginTop: 30 },
-  botao: {
-    position: "absolute",
-    bottom: 25,
-    right: 25,
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#4a2e8e",
+    marginBottom: 40,
+    textAlign: "center",
+  },
+  button: {
+    padding: 15,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });

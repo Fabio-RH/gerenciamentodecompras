@@ -1,17 +1,21 @@
+import React from "react";
 import { Stack } from "expo-router";
-import { ListasProvider } from "../context/ListasContext";
+import { ListasProvider } from "./context/ListasContext";
 
-export default function Layout() {
+export default function RootLayout() {
   return (
     <ListasProvider>
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: "#7b3fcf" },
-          headerTintColor: "#fff",
-          headerTitleAlign: "center",
-          headerShown: false,
-        }}
-      />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Tela inicial */}
+        <Stack.Screen name="index" />
+
+        {/* Telas de autenticação */}
+        <Stack.Screen name="login" />
+        <Stack.Screen name="cadastro" />
+
+        {/* Layout de abas do app */}
+        <Stack.Screen name="(tabs)" />
+      </Stack>
     </ListasProvider>
   );
 }
