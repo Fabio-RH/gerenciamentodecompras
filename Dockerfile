@@ -1,6 +1,6 @@
 FROM maven:3.9.9-amazoncorretto-21-alpine AS build
 COPY . .
-RUN npm i clean package -DskipTests
+RUN npm i package -DskipTests
 RUN ls -la /target/gerenciamentodecompras-0.0.1-SNAPSHOT.jar
 FROM amazoncorretto:21-alpine
 COPY --from=build target/gerenciamentodecompras-0.0.1-SNAPSHOT.jar app.jar
