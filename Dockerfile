@@ -3,5 +3,5 @@ COPY . .
 RUN mvn clean package -DskipTests
 FROM amazoncorretto:21-alpine
 COPY --from=build target/gerenciamentodecompras-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 9090
+EXPOSE 8406
 CMD ["java", "-jar", "/app.jar"]
