@@ -13,7 +13,7 @@ pipeline {
                     // Atualiza o PATH se necessário
                     env.PATH = "/usr/bin:$PATH"
                     // Instalar as dependências Maven antes de compilar o projeto
-                    sh 'npm i'  // Instala as dependências do Maven
+                    sh 'mvn clean install'  // Instala as dependências do Maven
                 }
             }
         }
@@ -41,7 +41,7 @@ pipeline {
             		sh "docker rm -v ${appName} || exit 0"  // Remover o container e os volumes associados
 
                     // Executar o novo container
-                    sh "docker-compose up -d --name ${appName} -p 8406:8406 ${imageTag}"
+                    sh "docker run -d --name ${appName} -p 8406:8406 ${imageTag}"
                 }
             }
         }
