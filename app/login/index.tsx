@@ -1,19 +1,23 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import {postData} from "../../components/api"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const handleLogin = () => {
-    if (email === "admin" && senha === "123") {
-      // Redireciona para a aba de lista após login bem-sucedido
+  const handleLogin = async () => {
+
+      const data_json = {'usuario_email': email, 'usuario_senha': senha};
+      const data = await postData('api/usuario/login', data_json)
+      const token = data.usuario_token
+      await AsyncStorage.setItem("@token", token);
+
       router.replace("/lista");
-    } else {
-      Alert.alert("Erro", "Usuário ou senha incorretos!");
-    }
+
   };
 
   return (
