@@ -7,28 +7,25 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // <<< ADICIONADO
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration {
 
     private final UserDetailsServiceImpl userDetailsService;
-
-    private final PasswordEncoder passwordEncoder;
     private final UserAuthenticationFilter userAuthenticationFilter;
 
     public SecurityConfiguration(UserDetailsServiceImpl userDetailsService,
-                                 PasswordEncoder passwordEncoder,
                                  UserAuthenticationFilter userAuthenticationFilter) {
         this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
         this.userAuthenticationFilter = userAuthenticationFilter;
     }
 
-    // Endpoints públicos
+    // ENDPOINTS PÚBLICOS
     public static final String[] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
             "/api/usuario/login",
             "/api/usuario/criar",
@@ -36,14 +33,13 @@ public class SecurityConfiguration {
             "/v3/api-docs/**"
     };
 
-    // Endpoints que requerem autenticação para serem acessados
-    public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
+    // ENDPOINTS RESTRITOS (LOGADO)
+    public static final String[] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
             "/api/usuario/atualizar/{usuarioId}",
             "/api/usuario/atualizarStatus{usuarioId}",
             "/api/usuario/listar",
             "/api/usuario/listarPorUsuarioId{usuarioId}",
             "/api/usuario/apagar/{usuarioId}",
-
 
             "/api/recibo/criar",
             "/api/recibo/atualizar/{reciboId}",
@@ -68,38 +64,44 @@ public class SecurityConfiguration {
 
             "/api/item/criar",
             "/api/item/atualizar/{itemId}",
-            "/api/item/atualizarStatus{itemd}",
+            "/api/item/atualizarStatus{itemId}",
             "/api/item/listar",
             "/api/item/listarPorItemId{itemId}",
             "/api/item/apagar/{itemId}",
     };
 
-    // Endpoints que só podem ser acessador por usuários com permissão de cliente
-    public static final String [] ENDPOINTS_CUSTOMER = {
+    // ENDPOINTS DE CLIENTE
+    public static final String[] ENDPOINTS_CUSTOMER = {
             "/jogo"
     };
 
-    // Endpoints que só podem ser acessador por usuários com permissão de administrador
-    public static final String [] ENDPOINTS_ADMIN = {
+    // ENDPOINTS DE ADMIN
+    public static final String[] ENDPOINTS_ADMIN = {
             "/categoria"
     };
 
-    // AuthenticationProvider com UserDetailsService + PasswordEncoder
+    // ✅ AGORA SIM: PasswordEncoder declarado corretamente
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // AuthenticationProvider configurado com PasswordEncoder
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
+        authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
-    // AuthenticationManager usando o provider
+    // AuthenticationManager usando nosso provider
     @Bean
     public AuthenticationManager authenticationManager() {
         return authenticationProvider()::authenticate;
     }
 
-    // SecurityFilterChain com seu filtro
+    // Configuração do filtro de segurança + JWT
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

@@ -1,5 +1,6 @@
 package com.senac.gerenciamentodecompras.service;
 
+import com.senac.gerenciamentodecompras.config.SecurityConfiguration;
 import com.senac.gerenciamentodecompras.dto.request.UsuarioDTOLoginRequest;
 import com.senac.gerenciamentodecompras.dto.request.UsuarioDTORequest;
 import com.senac.gerenciamentodecompras.dto.response.*;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Security;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,20 +29,20 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final SecurityConfiguration securityConfiguration;
     private final JwtTokenService jwtTokenService;
 
     public UsuarioService(AuthenticationManager authenticationManager,
                           UsuarioRepository usuarioRepository,
                           RoleRepository roleRepository,
                           ModelMapper modelMapper,
-                          PasswordEncoder passwordEncoder,
+                          SecurityConfiguration securityConfiguration,
                           JwtTokenService jwtTokenService) {
         this.authenticationManager = authenticationManager;
         this.usuarioRepository = usuarioRepository;
         this.roleRepository = roleRepository;
         this.modelMapper = modelMapper;
-        this.passwordEncoder = passwordEncoder;
+        this.securityConfiguration = securityConfiguration;
         this.jwtTokenService = jwtTokenService;
     }
 
@@ -61,7 +63,7 @@ public class UsuarioService {
         Usuario usuario = modelMapper.map(usuarioDTORequest, Usuario.class);
 
         // 🔒 Criptografar senha antes de salvar
-        usuario.setUsuario_senha(passwordEncoder.encode(usuario.getUsuario_senha()));
+        usuario.setUsuario_senha(securityConfiguration.passwordEncoder().encode(usuario.getUsuario_senha()));
 
         // 🔑 Atribuir roles pelo ID
         if (usuarioDTORequest.getRoleList() != null) {
@@ -82,7 +84,7 @@ public class UsuarioService {
         if (usuario != null) {
             modelMapper.map(usuarioDTORequest, usuario);
             if (usuarioDTORequest.getUsuario_senha() != null) {
-                usuario.setUsuario_senha(passwordEncoder.encode(usuarioDTORequest.getUsuario_senha()));
+                usuario.setUsuario_senha(securityConfiguration.passwordEncoder().encode(usuarioDTORequest.getUsuario_senha()));
             }
             // Atualizar roles se fornecido
             if (usuarioDTORequest.getRoleList() != null) {
