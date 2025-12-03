@@ -1,14 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-const baseURL = "http://172.26.48.1:8414"; // seu backend
+const baseURL = "http://localhost:8414";
 
 // =========================
 // POST COM TOKEN
 // =========================
 export const postData = async (route, body) => {
   try {
-    // Buscar token armazenado
     const token = await AsyncStorage.getItem("@token");
 
     const headers = {
@@ -29,15 +28,14 @@ export const postData = async (route, body) => {
   }
 };
 
-
 // =========================
 // LOGIN (ESPECÍFICO)
 // =========================
 export const login = async (email, senha) => {
   try {
     const body = {
-      usuario_email: email,
-      usuario_senha: senha,
+      usuarioEmail: email,    // <-- CORRETO
+      usuarioSenha: senha,    // <-- CORRETO
     };
 
     const response = await axios.post(`${baseURL}/api/usuario/login`, body);
@@ -54,7 +52,6 @@ export const login = async (email, senha) => {
     return null;
   }
 };
-
 
 // =========================
 // GET COM TOKEN (GENÉRICO)
