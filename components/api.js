@@ -1,50 +1,78 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
+const baseURL = "http://172.26.48.1:8414"; // seu backend
 
-const a = AsyncStorage;
-// const  baseURL =  "http://academico3.rj.senac.br/compras"
-const baseURL = 'http://172.26.48.1:8414'
-
+// =========================
+// POST COM TOKEN
+// =========================
 export const postData = async (route, body) => {
-    let token = null;
-    try {
-    const data = await AsyncStorage.getItem("@token");
-    await AsyncStorage.setItem("@token", data.usuario_token);
-    const o = await AsyncStorage.getItem("@token");
-    console.log(a)
-    }catch (error) {};
+  try {
+    // Buscar token armazenado
+    const token = await AsyncStorage.getItem("@token");
 
+    const headers = {
+      "Content-Type": "application/json",
+    };
 
-    try {
-
-        const headers = {
-      'Content-Type': 'application/json',
-    };  
-      if (token){
-      headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await axios.post(`${baseURL}/${route}`, body, { headers });
-
-      console.log(response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Error posting data:', error);
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
     }
-  };
+
+    const response = await axios.post(`${baseURL}/${route}`, body, { headers });
+    console.log("RESPOSTA POST:", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("Erro no POST:", error.response?.data || error.message);
+    throw error;
+  }
+};
 
 
-// export  get (route)
-//         const response = await axios.post(`${baseURL}/${route}`, { headers });
+// =========================
+// LOGIN (ESPECÍFICO)
+// =========================
+export const login = async (email, senha) => {
+  try {
+    const body = {
+      usuario_email: email,
+      usuario_senha: senha,
+    };
 
-// api.interceptors.request.use(async (config) => {
-//   const token = await AsyncStorage.getItem("@token");
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
+    const response = await axios.post(`${baseURL}/api/usuario/login`, body);
+
+    if (response.data?.usuario_token) {
+      await AsyncStorage.setItem("@token", response.data.usuario_token);
+    }
+
+    console.log("LOGIN OK", response.data);
+    return response.data;
+
+  } catch (error) {
+    console.log("ERRO LOGIN:", error.response?.data || error.message);
+    return null;
+  }
+};
 
 
+// =========================
+// GET COM TOKEN (GENÉRICO)
+// =========================
+export const getData = async (route) => {
+  try {
+    const token = await AsyncStorage.getItem("@token");
 
+    const headers = {};
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await axios.get(`${baseURL}/${route}`, { headers });
+    return response.data;
+  } catch (error) {
+    console.error("Erro no GET:", error.response?.data || error.message);
+    throw error;
+  }
+};

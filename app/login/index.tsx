@@ -1,23 +1,40 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert
+} from "react-native";
 import { useRouter } from "expo-router";
-import {postData} from "../../components/api"
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { login } from "../../components/api";  // <-- usa sua API corrigida
 
-export default function LoginScreen() {
-  const router = useRouter();
+export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
+  const router = useRouter();
+
   const handleLogin = async () => {
+    if (!email.trim() || !senha.trim()) {
+      Alert.alert("Erro", "Preencha e-mail e senha.");
+      return;
+    }
 
-      const data_json = {'usuario_email': email, 'usuario_senha': senha};
-      const data = await postData('api/usuario/login', data_json)
-      const token = data.usuario_token
-      await AsyncStorage.setItem("@token", token);
+    const resultado = await login(email.trim(), senha.trim());
 
-      router.replace("/lista");
+    if (!resultado) {
+      Alert.alert("Erro", "Falha ao fazer login. Verifique suas credenciais.");
+      return;
+    }
 
+    Alert.alert("Sucesso", "Login realizado com sucesso!");
+    router.replace("/home"); // vá para a tela principal
+  };
+
+  const irParaCadastro = () => {
+    router.push("/cadastro");
   };
 
   return (
@@ -26,22 +43,26 @@ export default function LoginScreen() {
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="E-mail"
+        autoCapitalize="none"
         value={email}
         onChangeText={setEmail}
-        autoCapitalize="none"
       />
 
       <TextInput
         style={styles.input}
         placeholder="Senha"
+        secureTextEntry
         value={senha}
         onChangeText={setSenha}
-        secureTextEntry
       />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Entrar</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.cadastrar} onPress={irParaCadastro}>
+        <Text style={styles.cadastrarText}>Criar conta</Text>
       </TouchableOpacity>
     </View>
   );
@@ -50,36 +71,44 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
+    padding: 20
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 30,
+    color: "#4a2e8e",
+    marginBottom: 40
   },
   input: {
-    width: "100%",
-    height: 45,
+    width: "80%",
     borderWidth: 1,
     borderColor: "#ccc",
+    padding: 12,
     borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    backgroundColor: "#fff",
+    marginBottom: 15
   },
   button: {
-    width: "100%",
-    height: 45,
-    backgroundColor: "#007bff",
+    backgroundColor: "#7b3fcf",
+    padding: 15,
     borderRadius: 10,
+    width: "80%",
     alignItems: "center",
-    justifyContent: "center",
+    marginTop: 10
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "bold"
   },
+  cadastrar: {
+    marginTop: 20
+  },
+  cadastrarText: {
+    color: "#4a2e8e",
+    fontWeight: "bold"
+  }
 });
