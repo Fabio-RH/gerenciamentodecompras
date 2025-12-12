@@ -2,8 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const api = axios.create({
-  // baseURL: "http://academico3.rj.senac.br/compras",
-  baseURL: "http://localhost:8414",
+  baseURL: "http://academico3.rj.senac.br/compras",
+  // baseURL: "http://localhost:8414",
     timeout: 10000,
 });
 
