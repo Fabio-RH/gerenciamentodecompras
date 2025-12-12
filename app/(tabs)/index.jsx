@@ -25,7 +25,7 @@ const abrirLista = async (lista_id, lista_nome) => {
     await AsyncStorage.setItem('lista_nome', lista_nome);
     router.replace("/lista/index"); 
   } catch (err) {
-    console.log("Erro ao salvar lista_id:" err);
+    console.log("Erro ao salvar lista_id:" ,err);
   }
 };
 
@@ -42,7 +42,7 @@ const abrirLista = async (lista_id, lista_nome) => {
         "lista_status": 1, "usuario_id" : id
       }
       const res = await api.post(`/api/lista/criar`, body)
-      console.log("função de criar lista: " res)
+      console.log("função de criar lista: " ,res)
       await loadListas()
     }
     catch(error) {console.log(error)}
