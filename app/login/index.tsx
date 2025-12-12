@@ -24,9 +24,9 @@ export default function Login() {
     }
 
     try {
-      const response = await api.post("/auth/login", {
-        email: email.trim(),
-        senha: senha.trim(),
+      const response = await api.post("/api/usuario/login", {
+        username: email.trim(),
+        password: senha.trim(),
       });
 
       console.log("RESPOSTA LOGIN:", response.data);
