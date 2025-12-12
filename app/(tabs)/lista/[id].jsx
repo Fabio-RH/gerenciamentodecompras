@@ -1,15 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useListas } from "../../context/ListasContext";
-
+import api from "@/components/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ItemList from "../../../components/item_list";
 export default function ListaDetalhe() {
-  const { id } = useLocalSearchParams();
   const router = useRouter();
   const { getLista, toggleItem, excluirItem, adicionarItem } = useListas();
-  const lista = getLista(String(id));
+  const [lista, setLista] = useState(null);
+  const [listaId, setListaId] = useState(null);
+  const [listaNome, setListaNome] = useState(null);
+
+  const loadLista = async () =>{
+    const lista_id = await AsyncStorage.getItem("lista_id")
+    const lista_nome = await AsyncStorage.getItem("lista_nome")
+    const lista_data = await api.get(`/api/item/listar/${lista_id}`)
+    console.log(lista_data.data)
+    setLista(lista_data.data)
+    setListaId(lista_id)
+    setListaNome(lista_nome)
+  }
+
+  useEffect(() => {
+
+
+    loadLista();
+
+    }, []);
 
   const [novoItem, setNovoItem] = useState("");
+  const [novoItemQuantidade, setNovoItemQuantidade] = useState("");
 
   if (!lista) {
     return (
@@ -19,60 +40,60 @@ export default function ListaDetalhe() {
     );
   }
 
-  const handleAddItem = () => {
-    if (!novoItem.trim()) {
-      Alert.alert("Erro", "Digite o nome do item!");
-      return;
+  const handleAddItem = async () => {
+
+    const body1 = {'produto_nome': novoItem, 'produto_categoria': 'produto',
+      'produto_unidade_medida': 'padrao', 'produto_status': 1
     }
-    adicionarItem(lista.id, novoItem.trim());
-    setNovoItem("");
+
+    const res1 = await api.post(`/api/produto/criar`, body1)
+    
+    const p_id = res1.data.produto_id
+    const body2 = {'item_quantidade' : novoItemQuantidade, 'item_status': 1,
+      'lista_id': listaId, 'produto_id' : p_id
+    }
+
+    const res2 = await api.post(`/api/item/criar`, body2)
+
+    await loadLista()
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{lista.nome}</Text>
 
-      <FlatList
-        data={lista.itens}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            <TouchableOpacity onPress={() => toggleItem(lista.id, item.id)}>
-              <Text
-                style={[
-                  styles.itemText,
-                  { textDecorationLine: item.comprado ? "line-through" : "none" },
-                ]}
-              >
-                {item.nome}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => excluirItem(lista.id, item.id)}>
-              <Text style={styles.deleteText}>🗑️</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
+
 
       {/* Input para adicionar item sem sair da tela */}
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
-          placeholder="Novo item"
+          placeholder="Nome do item"
           value={novoItem}
           onChangeText={setNovoItem}
         />
+                <TextInput
+          style={styles.input}
+          placeholder="Quantidade"
+          value={novoItemQuantidade}
+          onChangeText={setNovoItemQuantidade}
+        />
+        
+
+        
+      </View>
         <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
-      </View>
-
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => router.back()}
       >
         <Text style={styles.backText}>Voltar</Text>
       </TouchableOpacity>
+
+      <Text style={{textAlign: 'center', marginBottom: 20, fontSize: 25, fontWeight: 800}}> Mostrando lista: "{listaNome}"</Text>
+              <ItemList lista={lista} />
     </View>
   );
 }
@@ -90,7 +111,7 @@ const styles = StyleSheet.create({
   },
   itemText: { fontSize: 18 },
   deleteText: { color: "red", fontSize: 18 },
-  inputRow: { flexDirection: "row", marginTop: 10 },
+  inputRow: { flexDirection: "column", marginTop: 10 },
   input: {
     flex: 1,
     borderWidth: 1,
@@ -98,6 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 10,
     borderRadius: 8,
+    marginBottom: 10
   },
   addButton: {
     marginLeft: 10,
@@ -114,6 +136,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 20,
   },
-  backText: { color: "#fff", fontWeight: "bold" },
+  backText: { color: "#fff", fontWeight: "bold"},
 });

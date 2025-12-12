@@ -1,12 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import {useListas} from "../context/ListasContext"
-
+import ListaList from '../../components/lista_list'
+import api from "@/components/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function ListaScreen() {
   const router = useRouter();
   const { listas, adicionarLista, removerLista } = useListas();
+  const [dataList, setDataList] = useState([]);
   const [nome, setNome] = useState("");
+
+
+
+  const loadListas = async () =>{
+      const id = await AsyncStorage.getItem('id')
+      const res = await api.get(`/api/lista/listarPorUsuario/${id}`)
+      setDataList(res.data)
+  }
+
+const abrirLista = async (lista_id, lista_nome) => {
+  try {
+    await AsyncStorage.setItem('lista_id', lista_id);
+    await AsyncStorage.setItem('lista_nome', lista_nome);
+    router.replace("/lista/index"); 
+  } catch (err) {
+    console.log("Erro ao salvar lista_id:", err);
+  }
+};
+
+
 
   const criarLista = () => {
     if (nome.trim()) {
@@ -14,6 +37,14 @@ export default function ListaScreen() {
       setNome("");
     }
   };
+
+ useEffect(() => {
+
+
+  loadListas();
+
+  console.log(dataList)
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -30,21 +61,7 @@ export default function ListaScreen() {
         <Text style={styles.buttonText}>Adicionar Lista</Text>
       </TouchableOpacity>
 
-      <FlatList
-        data={listas}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.listItem}
-            onPress={() => router.push(`/lista/${item.id}`)}
-          >
-            <Text style={styles.listText}>{item.nome}</Text>
-            <TouchableOpacity onPress={() => removerLista(item.id)}>
-              <Text style={styles.deleteText}>Excluir</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        )}
-      />
+      <ListaList OnPress={abrirLista} lista={dataList} />
     </View>
   );
 }

@@ -99,7 +99,7 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    @CrossOrigin(origins = "*")
+
     @PostMapping("/login")
     public ResponseEntity<UsuarioDTOLoginResponse> login(@RequestBody UsuarioDTOLoginRequest usuarioDTOLoginRequest){
         return ResponseEntity.ok(usuarioService.login(usuarioDTOLoginRequest));

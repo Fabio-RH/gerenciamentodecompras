@@ -25,14 +25,14 @@ export default function Login() {
 
     try {
       const response = await api.post("/api/usuario/login", {
-        username: email.trim(),
-        password: senha.trim(),
+        usuario_email: email.trim(),
+        usuario_senha: senha.trim(),
       });
 
       console.log("RESPOSTA LOGIN:", response.data);
 
-      const token = response.data.token;
-
+      const token = response.data.usuario_token;
+      const id = response.data.usuario_id;
       if (!token) {
         Alert.alert("Erro", "Resposta inválida do servidor.");
         return;
@@ -40,6 +40,7 @@ export default function Login() {
 
       // Salvar token localmente
       await AsyncStorage.setItem("@token", token);
+      await AsyncStorage.setItem("id", id);
 
       Alert.alert("Sucesso", "Login realizado com sucesso!");
       router.replace("/(tabs)"); // navega para a tela principal

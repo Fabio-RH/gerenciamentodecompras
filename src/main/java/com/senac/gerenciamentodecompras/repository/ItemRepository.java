@@ -20,6 +20,10 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
     @Query("SELECT i from Item i WHERE i.item_status >= 0")
     List<Item> listarItens();
 
+    @Query("SELECT i FROM Item i WHERE i.lista.lista_id = :lista_id")
+    List<Item> listarItensPorLista(@Param("lista_id") Integer lista_id);
+
+
     @Query("SELECT i from Item i where i.id=:id AND i.item_status >=0")
     Item obterItemPeloId(@Param("id") Integer itemId);
 }

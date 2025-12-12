@@ -1,20 +1,13 @@
 package com.senac.gerenciamentodecompras.dto.response;
 
-public class ItemDTOResponse {
+public class ItemDTOResponseP {
 
     private Integer item_id;
     private int item_quantidade;
     private int item_status;
 
-    private int produto_id;
-
-    public int getProduto_id() {
-        return produto_id;
-    }
-
-    public void setProduto_id(int produto_id) {
-        this.produto_id = produto_id;
-    }
+    // Novo campo para exibir o nome do produto
+    private String item_nome;
 
     public Integer getItem_id() {
         return item_id;
@@ -38,5 +31,14 @@ public class ItemDTOResponse {
 
     public void setItem_status(int item_status) {
         this.item_status = item_status;
+    }
+
+    // --- Getters e Setters do novo campo ---
+    public String getItem_nome() {
+        return item_nome;
+    }
+
+    public void setItem_nome(String item_nome) {
+        this.item_nome = item_nome;
     }
 }
