@@ -25,7 +25,7 @@ const abrirLista = async (lista_id, lista_nome) => {
     await AsyncStorage.setItem('lista_nome', lista_nome);
     router.replace("/lista/index"); 
   } catch (err) {
-    console.log("Erro ao salvar lista_id:", err);
+    console.log("Erro ao salvar lista_id:" err);
   }
 };
 
