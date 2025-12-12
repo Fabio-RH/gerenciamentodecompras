@@ -31,11 +31,22 @@ const abrirLista = async (lista_id, lista_nome) => {
 
 
 
-  const criarLista = () => {
-    if (nome.trim()) {
-      adicionarLista(nome.trim());
-      setNome("");
+  const criarLista = async () => {
+    try{
+      const id = await AsyncStorage.getItem('id')
+      const dataAtual = new Date();
+      const formatoISO = dataAtual.toISOString().split('.')[0];
+
+      const body = {
+        "lista_nome" : nome, "lista_dataCriacao" : formatoISO,
+        "lista_status": 1, "usuario_id" : id
+      }
+      const res = await api.post(`/api/lista/criar`, body)
+      console.log("função de criar lista: " res)
+      await loadListas()
     }
+    catch(error) {console.log(error)}
+
   };
 
  useEffect(() => {
