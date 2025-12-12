@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ListUp - Gerenciador de Listas de Compras</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode.js/1.5.3/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #faf5ff 100%);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                padding: 0 2rem;
+            }
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e9d5ff;
+            padding: 1rem 0;
+        }
+
+        header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo svg {
+            width: 2rem;
+            height: 2rem;
+            color: #9333ea;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #581c87;
+        }
+
+        nav {
+            display: none;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            nav {
+                display: flex;
+            }
+        }
+
+        nav a {
+            color: #374151;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #9333ea;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 5rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .hero {
+                padding: 8rem 0;
+            }
+        }
+
+        .hero .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .hero .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .hero-content h2 {
+            font-size: 2.25rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: #111827;
+        }
+
+        @media (min-width: 768px) {
+            .hero-content h2 {
+                font-size: 3.75rem;
+            }
+        }
+
+        .hero-content h2 .highlight {
+            color: #9333ea;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #9333ea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #7e22ce;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #9333ea;
+            border: 2px solid #e9d5ff;
+        }
+
+        .btn-secondary:hover {
+            background: #faf5ff;
+        }
+
+        .hero-image {
+            display: none;
+            justify-content: center;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .hero-image {
+                display: flex;
+            }
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 28rem;
+        }
+
+        .hero-image-glow {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, #a78bfa, #c084fc);
+            border-radius: 1.5rem;
+            filter: blur(2rem);
+            opacity: 0.2;
+        }
+
+        .hero-image img {
+            position: relative;
+            width: 100%;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 8px solid white;
+        }
+
+        /* Features Section */
+        .features {
+            background: white;
+            padding: 5rem 0;
+            border-top: 1px solid #e9d5ff;
+        }
+
+        @media (min-width: 768px) {
+            .features {
+                padding: 8rem 0;
+            }
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h3 {
+            font-size: 2.25rem;
+            margin-bottom: 1rem;
+            color: #111827;
+        }
+
+        @media (min-width: 768px) {
+            .section-header h3 {
+                font-size: 3rem;
+            }
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: #4b5563;
+            max-width: 42rem;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid #e9d5ff;
+            transition: box-shadow 0.3s;
+        }
+
+        .feature-card:nth-child(2) {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-color: #bfdbfe;
+        }
+
+        .feature-card:nth-child(3) {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-color: #bbf7d0;
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .feature-card:nth-child(1) .feature-icon {
+            background: #9333ea;
+        }
+
+        .feature-card:nth-child(2) .feature-icon {
+            background: #2563eb;
+        }
+
+        .feature-card:nth-child(3) .feature-icon {
+            background: #16a34a;
+        }
+
+        .feature-card h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #111827;
+        }
+
+        .feature-card p {
+            color: #4b5563;
+        }
+
+        .about-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid #e9d5ff;
+        }
+
+        @media (min-width: 768px) {
+            .about-box {
+                padding: 3rem;
+            }
+        }
+
+        .about-box h4 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #111827;
+        }
+
+        .about-box p {
+            color: #4b5563;
+            margin-bottom: 1rem;
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        @media (min-width: 768px) {
+            .screenshots {
+                padding: 8rem 0;
+            }
+        }
+
+        .screenshot-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 4rem;
+        }
+
+        @media (min-width: 768px) {
+            .screenshot-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .screenshot-text h4 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #111827;
+        }
+
+        .screenshot-text p {
+            color: #4b5563;
+        }
+
+        .screenshot-image {
+            display: flex;
+            justify-content: center;
+        }
+
+        .screenshot-image img {
+            width: 100%;
+            max-width: 28rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 4px solid white;
+        }
+
+        /* Download Section */
+        .download {
+            background: linear-gradient(135deg, #9333ea 0%, #6b21a8 100%);
+            color: white;
+            padding: 5rem 0;
+        }
+
+        @media (min-width: 768px) {
+            .download {
+                padding: 8rem 0;
+            }
+        }
+
+        .download .section-header h3,
+        .download .section-header p {
+            color: white;
+        }
+
+        .download .section-header p {
+            color: #e9d5ff;
+        }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            max-width: 56rem;
+            margin: 0 auto 3rem;
+        }
+
+        @media (min-width: 768px) {
+            .download-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .download-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+        }
+
+        .download-card:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .download-card-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .download-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .download-card:nth-child(1) .download-icon {
+            background: #16a34a;
+        }
+
+        .download-card:nth-child(2) .download-icon {
+            background: #2563eb;
+        }
+
+        .download-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #111827;
+        }
+
+        .download-card p {
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+        }
+
+        .qr-code-container {
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .qr-code-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .qr-code-label {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-top: 0.5rem;
+        }
+
+        .download-card .btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1rem;
+        }
+
+        .download-links {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .download-links p {
+            margin-bottom: 1rem;
+        }
+
+        .download-links-flex {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .download-links-flex {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+
+        .download-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .download-links a:hover {
+            color: #e9d5ff;
+        }
+
+        .separator {
+            color: #d8b4fe;
+        }
+
+        /* Footer */
+        footer {
+            background: #111827;
+            color: #9ca3af;
+            padding: 3rem 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .footer-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .footer-section h5 {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: #a78bfa;
+        }
+
+        .footer-logo h5 {
+            margin: 0;
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #1f2937;
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        /* Icons SVG */
+        .icon {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            vertical-align: middle;
+        }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <h1>ListUp</h1>
+            </div>
+            <nav>
+                <a href="#features">Funcionalidades</a>
+                <a href="#screenshots">Screenshots</a>
+                <a href="#download">Download</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Organize suas <span class="highlight">compras</span> com facilidade</h2>
+                <p>ListUp é um aplicativo mobile Android que torna o gerenciamento de listas de compras rápido, simples e intuitivo.</p>
+                <div class="hero-buttons">
+                    <a href="#download" class="btn btn-primary">
+                        <span>⬇️</span> Baixar Agora
+                    </a>
+                    <a href="#features" class="btn btn-secondary">Saiba Mais</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-image-wrapper">
+                    <div class="hero-image-glow"></div>
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 600'%3E%3Crect fill='%23f3f4f6' width='300' height='600'/%3E%3Ctext x='50%' y='50%' font-size='16' fill='%239ca3af' text-anchor='middle' dominant-baseline='middle'%3EScreenshot do App%3C/text%3E%3C/svg%3E" alt="ListUp App Screenshot">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h3>Funcionalidades Principais</h3>
+                <p>Tudo que você precisa para organizar suas compras de forma eficiente</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🛒</div>
+                    <h4>Gerenciamento de Listas</h4>
+                    <p>Crie, renomeie e exclua listas de compras personalizadas para diferentes ocasiões.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✏️</div>
+                    <h4>Edição de Itens</h4>
+                    <p>Adicione, edite e remova itens com facilidade. Inclua quantidade e observações.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h4>Marcar como Coletado</h4>
+                    <p>Marque itens como "Peguei" para acompanhar o progresso das suas compras em tempo real.</p>
+                </div>
+            </div>
+
+            <div class="about-box">
+                <h4>Sobre o ListUp</h4>
+                <p>O ListUp é um aplicativo mobile Android desenvolvido com o objetivo de facilitar a organização das compras do usuário de forma rápida, simples e intuitiva. O app permite criar diferentes listas de compras personalizadas, ideal para quem deseja organizar compras semanais, mensais ou listas específicas para eventos.</p>
+                <p>O aplicativo foi criado para otimizar o tempo do usuário, evitando esquecer itens importantes e tornando a experiência de compras mais prática. Com uma interface simples e funcional, o app permite que o usuário acompanhe o progresso da lista em tempo real enquanto realiza as compras.</p>
+            </div>
+        </div>
+    </section>
+
+<!-- Screenshots Section (caminho absoluto Windows) -->
+<section id="screenshots" class="screenshots">
+    <div class="container">
+        <div class="section-header">
+            <h3>Veja como funciona</h3>
+            <p>Conheça a interface intuitiva do ListUp</p>
+        </div>
+
+        <div class="screenshot-row">
+            <div class="screenshot-text">
+                <h4>Tela Inicial</h4>
+                <p>Visualize todas as suas listas de compras em um só lugar. Crie novas listas, renomeie ou exclua as existentes com apenas alguns toques.</p>
+            </div>
+            <div class="screenshot-image">
+                <img src="C:\Users\36129382024.1m\Pictures\gerenciamentodecompras\Home\images\Captura%20de%20tela%202025-12-08%20193020.png"
+                     alt="ListUp Home Screen">
+            </div>
+        </div>
+
+        <div class="screenshot-row">
+            <div class="screenshot-image" style="order: -1;">
+                <img src="C:\Users\36129382024.1m\Pictures\gerenciamentodecompras\Home\images\Captura%20de%20tela%202025-12-08%20193240.png"
+                     alt="ListUp Items Screen">
+            </div>
+            <div class="screenshot-text">
+                <h4>Gerenciamento de Itens</h4>
+                <p>Adicione itens à sua lista, marque como coletado quando encontrar no supermercado, e remova quando necessário. Acompanhe o progresso em tempo real.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+    <!-- Download Section -->
+    <section id="download" class="download">
+        <div class="container">
+            <div class="section-header">
+                <h3>Baixe o ListUp Agora</h3>
+                <p>Disponível para Android. Escolha a forma que melhor se adequa a você.</p>
+            </div>
+
+            <div class="download-grid">
+                <!-- Android APK -->
+                <div class="download-card">
+                    <div class="download-card-header">
+                        <div class="download-icon">🤖</div>
+                        <h4>Android (APK)</h4>
+                        <p>Baixe o arquivo APK diretamente e instale no seu dispositivo Android.</p>
+                    </div>
+
+                     <div class="qr-code-container">
+                        <p class="qr-info">Escaneie para abrir no Expo Go:</p>
+                        <!-- Placeholder para o QR Code do Expo -->
+                        <img src="C:\Users\binho\Downloads\gerenciamentodecompras-main (4)\gerenciamentodecompras-main\src\main\resources\imagens\qrcode.png" alt="QR Code Expo Go" class="qr-image">
+                    </div>
+
+                    <a href="https://expo.dev/artifacts/eas/eyTZ9FPJfwhjmVdfWnzUqi.apk" download class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem; border-top: 1px solid #e5e7eb; padding-top: 1rem;">
+                        ⬇️ Baixar APK
+                    </a>
+                </div>
+
+                <!-- Expo -->
+                <div class="download-card">
+                    <div class="download-card-header">
+                        <div class="download-icon">📱</div>
+                        <h4>Expo (Preview)</h4>
+                        <p>Acesse a versão de preview através do Expo Go.</p>
+                    </div>
+
+                    <div class="qr-code-container">
+                        <div id="qrcode-expo"></div>
+                        <div class="qr-code-label">Escaneie para acessar no Expo</div>
+                        <img src="C:\Users\binho\Downloads\gerenciamentodecompras-main (4)\gerenciamentodecompras-main\src\main\resources\imagens\qrcode.png" alt="QR Code Expo Go" class="qr-image">
+                    </div>
+
+                    <a href="https://expo.dev/accounts/fabiorh/projects/listUp/builds/6ddea3ec-4d97-40d2-88ac-1aa081610c89" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem; border-top: 1px solid #e5e7eb; padding-top: 1rem; background: #2563eb;">
+                        🔗 Abrir no Expo
+                    </a>
+                </div>
+            </div>
+
+            <div class="download-links">
+                <p>Ou use os links diretos:</p>
+                <div class="download-links-flex">
+                    <a href="listup-app.apk" download>⬇️ Baixar APK</a>
+                    <span class="separator">•</span>
+                    <a href="https://expo.dev/artifacts/eas/eyTZ9FPJfwhjmVdfWnzUqi.apk" target="_blank" rel="noopener noreferrer">🔗 Abrir no Expo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <h5>ListUp</h5>
+                    </div>
+                    <p>Gerenciador de listas de compras para Android</p>
+                </div>
+
+                <div class="footer-section">
+                    <h5>Links Rápidos</h5>
+                    <ul>
+                        <li><a href="#features">Funcionalidades</a></li>
+                        <li><a href="#screenshots">Screenshots</a></li>
+                        <li><a href="#download">Download</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h5>Contato</h5>
+                    <p>Desenvolvido com ❤️ para facilitar suas compras</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 ListUp. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Gerar QR Codes
+        new QRCode(document.getElementById("qrcode-apk"), {
+            text: "listup-app.apk",
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        new QRCode(document.getElementById("qrcode-expo"), {
+            text: "https://expo.dev/accounts/fabiorh/projects/listUp/builds/6ddea3ec-4d97-40d2-88ac-1aa081610c89",
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
